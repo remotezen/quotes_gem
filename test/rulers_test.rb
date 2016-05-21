@@ -5,7 +5,8 @@ class RulersTest < Minitest::Test
     refute_nil ::Rulers::VERSION
   end
 
-  def test_it_does_something_useful
-    assert false
+  def test_request
+    get "/"
+    assert_response :success
   end
 end
