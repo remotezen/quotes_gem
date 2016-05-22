@@ -1,9 +1,7 @@
 require 'test_helper'
 
 class RulersTest < Minitest::Test
-  def test_that_it_has_a_version_number
-    refute_nil ::Rulers::VERSION
-  end
+  include Rack::Test::Methods
 
   def test_request
     get "/"
