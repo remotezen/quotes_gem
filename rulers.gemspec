@@ -32,5 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_runtime_dependency "rack", "~> 1.6"
   spec.add_runtime_dependency "erubis", "~> 2.6"
+  gem add_run_time_dpendency "multi_json", "~> 1.12"
   spec.add_development_dependency "rack-minitest", "~> 0.0.10"
 end
