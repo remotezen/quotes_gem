@@ -1,4 +1,5 @@
 require "multi_json"
+require "json"
 module Rulers
   module Model
     class FileModel
@@ -20,20 +21,44 @@ module Rulers
 
       def self.find(id)
         begin
-          FileModel.new("db/quotes/#{id}.json")
+         FileModel.new("db/quotes/#{id}.json")
         rescue
           return nil
         end
+
+      end
+      def self.submitter(string)
+        files = Dir["db/quotes/*.json"]
+        string = string.gsub(/\r/," ")
+        string = string.gsub(/\n/," ")
+        arr = Array.new
+        files.each do |f| 
+          obj = FileModel.new(f)
+          h = obj.hash
+          s = String.new(h["submitter"])
+          if string == s 
+            arr << h
+          end
+        end
+          STDERR.puts(arr.inspect)
+          arr
+      end
+
+      def hash
+        @hash
       end
     
       def self.all
         files = Dir["db/quotes/*.json"]
-        begin
-          files.map {|f| FileModel.new f}
-        raise
-          STDERR.puts "no such dir"
+        files.map {|f| FileModel.new f}
+      end      
+      def update(attrs)
+        @hash.merge!(attrs)
+        File.open(@filename, "w") do |f|
+          f.write(hash.to_json)
         end
       end
+      
       def self.create(attrs)
         hash = {}
         hash["submitter"] = attrs["submitter"] || ""
@@ -41,19 +66,17 @@ module Rulers
         hash["attribution"] = attrs["attribution"] || ""
         files = Dir["db/quotes/*json"]
         names = files.map {|f| f.split("/")[-1]}
-        highest = names.map {|b| [0...-5].to_i}.max
+        highest = names.map {|b| b[0...-5].to_i }.max
         id  = highest + 1
-        File.open("db/quotes/#{id}.json", "w") do |f|
-          f.write <<TEMPLATE
-          {
-          "submitter": "#{hash["submitter"]}",
-          "quote": "#{hash["quote"]}",
-          "attribution" : "#{hash["attribution"]}"
+         h = {
+          "submitter" => hash["submitter"],
+          "quote" => hash["quote"],
+          "attribution" =>  hash["attribution"]
           }
-          TEMPLATE
-          end
+        File.open("db/quotes/#{id}.json", "w") do |f|
+          f.write(h.to_json)
         end
-        FileModel.new "db/quote/#{id}.json"
+        FileModel.new "db/quotes/#{id}.json"
       end
     end
   end
